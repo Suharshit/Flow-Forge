@@ -2,6 +2,10 @@ import { Step } from '../steps/step.interface';
 import { LogStep } from '../steps/log.step';
 import { TransformStep } from '../steps/transform.step';
 import { ValidateStep } from '../steps/validate.step';
+import { FetchGmailStep } from '../steps/fetch-gmail.step';
+import { ClassifyEmailStep } from '../steps/classify-email.step';
+import { ExtractJobDataStep } from '../steps/extract-job-data.step';
+import { MarkEmailReadStep } from '../steps/mark-email-read.step';
 
 type StepConstructor = new (config: any) => Step;
 
@@ -16,6 +20,12 @@ export class StepRegistry {
         this.register('log', LogStep);
         this.register('transform', TransformStep);
         this.register('validate', ValidateStep);
+
+        // Gmail steps
+        this.register('fetch_gmail', FetchGmailStep);
+        this.register('classify_email', ClassifyEmailStep);
+        this.register('extract_job_data', ExtractJobDataStep);
+        this.register('mark_email_read', MarkEmailReadStep);
     }
 
     register(type: string, stepClass: StepConstructor): void {

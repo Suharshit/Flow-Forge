@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { pool, closeDatabase } from './config/database';
 import workflowRoutes from './api/routes/workflow.routes';
+import authRoutes from './api/routes/auth.routes';
 
 import { closeRedis } from './config/redis';
 import './queue/workflow.worker'; // This starts the worker
@@ -19,6 +20,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 app.use('/api/workflows', workflowRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use((req: Request, res: Response) => {
     res.status(404).json({ error: 'Route not found' });
