@@ -6,6 +6,8 @@ import { FetchGmailStep } from '../steps/fetch-gmail.step';
 import { ClassifyEmailStep } from '../steps/classify-email.step';
 import { ExtractJobDataStep } from '../steps/extract-job-data.step';
 import { MarkEmailReadStep } from '../steps/mark-email-read.step';
+import { AppendToNotionStep } from '../steps/append-to-notion.step';
+import { CreateCalendarEventStep } from '../steps/create-calendar-event.step';
 
 type StepConstructor = new (config: any) => Step;
 
@@ -26,6 +28,12 @@ export class StepRegistry {
         this.register('classify_email', ClassifyEmailStep);
         this.register('extract_job_data', ExtractJobDataStep);
         this.register('mark_email_read', MarkEmailReadStep);
+
+        // Notion steps
+        this.register('append_to_notion', AppendToNotionStep);
+
+        // Calendar steps
+        this.register('create_calendar_event', CreateCalendarEventStep);
     }
 
     register(type: string, stepClass: StepConstructor): void {

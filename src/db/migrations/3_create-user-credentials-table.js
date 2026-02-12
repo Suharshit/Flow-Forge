@@ -12,7 +12,7 @@ exports.up = (pgm) => {
         service: {
             type: 'varchar(50)',
             notNull: true,
-            check: "service IN ('gmail', 'notion', 'slack')",
+            check: "service IN ('gmail', 'notion', 'google-calendar', 'slack')",
         },
         access_token: {
             type: 'text',

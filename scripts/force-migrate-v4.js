@@ -20,7 +20,7 @@ client.connect().then(async () => {
             CREATE TABLE IF NOT EXISTS user_credentials (
                 id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
                 user_id varchar(255) NOT NULL,
-                service varchar(50) NOT NULL CHECK (service IN ('gmail', 'notion', 'slack')),
+                service varchar(50) NOT NULL CHECK (service IN ('gmail', 'notion', 'google-calendar', 'slack')),
                 access_token text NOT NULL,
                 refresh_token text,
                 token_expiry timestamp,

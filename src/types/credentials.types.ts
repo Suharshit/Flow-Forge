@@ -1,4 +1,4 @@
-export type ServiceType = 'gmail' | 'notion' | 'slack';
+export type ServiceType = 'gmail' | 'notion' | 'google-calendar' | 'slack';
 
 export interface UserCredential {
     id: string;
