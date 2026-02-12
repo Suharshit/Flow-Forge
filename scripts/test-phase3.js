@@ -75,7 +75,7 @@ async function run() {
     const schedulesRes = await getSchedules();
     console.log('Schedules:', JSON.stringify(schedulesRes.body.data, null, 2));
 
-    const job = schedulesRes.body.data.find(j => j.id.includes(workflowId));
+    const job = schedulesRes.body.data.find(j => j.name.includes(workflowId));
     if (job) {
         console.log('✅ Schedule found in Redis');
     } else {
@@ -88,7 +88,7 @@ async function run() {
 
     // Verify schedule removed
     const pausedSchedules = await getSchedules();
-    const pausedJob = pausedSchedules.body.data.find(j => j.id.includes(workflowId));
+    const pausedJob = pausedSchedules.body.data.find(j => j.name.includes(workflowId));
     if (!pausedJob) {
         console.log('✅ Schedule removed after pause');
     } else {
@@ -101,7 +101,7 @@ async function run() {
 
     // Verify schedule added back
     const resumedSchedules = await getSchedules();
-    const resumedJob = resumedSchedules.body.data.find(j => j.id.includes(workflowId));
+    const resumedJob = resumedSchedules.body.data.find(j => j.name.includes(workflowId));
     if (resumedJob) {
         console.log('✅ Schedule restored after resume');
     } else {
@@ -115,7 +115,7 @@ async function run() {
     });
 
     const updatedSchedules = await getSchedules();
-    const updatedJob = updatedSchedules.body.data.find(j => j.id.includes(workflowId));
+    const updatedJob = updatedSchedules.body.data.find(j => j.name.includes(workflowId));
     // BullMQ job ID might verify pattern, but simple existence check is good for now.
     // Ideally we check the cron pattern but that's deep in job options.
     console.log('Updated Schedules:', JSON.stringify(updatedSchedules.body.data, null, 2));

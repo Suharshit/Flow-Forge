@@ -5,10 +5,10 @@ dotenv.config();
 
 const poolConfig: PoolConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: { rejectUnauthorized: false }, // Neon requires SSL
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 10000, // 10s to handle Neon cold starts
 };
 
 export const pool = new Pool(poolConfig);

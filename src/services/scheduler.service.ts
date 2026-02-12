@@ -44,14 +44,19 @@ export class SchedulerService {
      * Remove scheduled job for a workflow
      */
     async unscheduleWorkflow(workflowId: string): Promise<void> {
-        const jobId = `scheduled-${workflowId}`;
+        const jobName = `workflow-${workflowId}`;
 
-        // Remove repeatable job
-        await workflowQueue.removeRepeatable({
-            jobId,
-        });
+        // Get all repeatable jobs and find the one matching this workflow
+        const repeatableJobs = await workflowQueue.getRepeatableJobs();
+        const matchingJob = repeatableJobs.find(j => j.name === jobName);
 
-        console.log(`🗑️  Unscheduled workflow ${workflowId}`);
+        if (matchingJob) {
+            // removeRepeatableByKey uses the job's unique key
+            await workflowQueue.removeRepeatableByKey(matchingJob.key);
+            console.log(`🗑️  Unscheduled workflow ${workflowId}`);
+        } else {
+            console.log(`No schedule found for workflow ${workflowId}`);
+        }
     }
 
     /**

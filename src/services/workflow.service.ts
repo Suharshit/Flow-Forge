@@ -20,7 +20,11 @@ export class WorkflowService {
 
         // If workflow is scheduled type and active, schedule it
         if (workflow.trigger_type === 'scheduled' && workflow.is_active) {
-            await this.schedulerService.scheduleWorkflow(workflow);
+            try {
+                await this.schedulerService.scheduleWorkflow(workflow);
+            } catch (error) {
+                console.error('Failed to schedule workflow (will need to be scheduled manually):', error);
+            }
         }
 
         return workflow;

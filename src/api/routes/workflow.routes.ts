@@ -70,7 +70,8 @@ router.post('/', async (req: Request, res: Response) => {
         res.status(201).json({ success: true, data: workflow });
     } catch (error) {
         console.error('Error creating workflow:', error);
-        res.status(500).json({ success: false, error: 'Internal server error' });
+        const message = error instanceof Error ? error.message : 'Internal server error';
+        res.status(500).json({ success: false, error: message });
     }
 });
 
