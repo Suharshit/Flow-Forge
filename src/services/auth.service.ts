@@ -32,8 +32,25 @@ export class AuthService {
     }
 
     // Notion methods
-    async getNotionDatabases() {
-        return await this.notionService.listDatabases();
+    getNotionAuthUrl(): string {
+        return this.notionService.getAuthUrl();
+    }
+
+    async handleNotionCallback(code: string, userId: string): Promise<void> {
+        await this.notionService.handleCallback(code, userId);
+    }
+
+    async getNotionDatabases(userId: string) {
+        return await this.notionService.listDatabases(userId);
+    }
+
+    async disconnectNotion(userId: string): Promise<void> {
+        await this.notionService.disconnect(userId);
+    }
+
+    async getNotionStatus(userId: string): Promise<{ connected: boolean }> {
+        const connected = await this.notionService.isConnected(userId);
+        return { connected };
     }
 
     // Google Calendar methods

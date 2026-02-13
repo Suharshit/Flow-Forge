@@ -102,26 +102,103 @@ router.post('/gmail/disconnect', authenticateToken, async (req: Request, res: Re
 // ============================================================
 
 /**
- * GET /api/auth/notion/databases
- * List available Notion databases
+ * GET /api/auth/notion/connect
+ * Start Notion OAuth flow
  */
-router.get('/notion/databases', authenticateToken, async (req: Request, res: Response) => {
+router.get('/notion/connect', authenticateToken, (req: Request, res: Response) => {
   try {
-    const databases = await authService.getNotionDatabases();
-    res.json({ success: true, databases });
+    const authUrl = authService.getNotionAuthUrl();
+    res.json({ success: true, authUrl });
   } catch (error) {
-    console.error('Error listing databases:', error);
-    res.status(500).json({ success: false, error: 'Failed to list databases' });
+    console.error('Error generating Notion auth URL:', error);
+    res.status(500).json({ success: false, error: 'Failed to generate auth URL' });
+  }
+});
+
+/**
+ * GET /api/auth/notion/callback
+ * Handle OAuth callback from Notion
+ */
+router.get('/notion/callback', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const { code } = req.query;
+    const userId = req.user!.userId;
+
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ success: false, error: 'Authorization code missing' });
+    }
+
+    await authService.handleNotionCallback(code, userId);
+
+    res.send(`
+      <html>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1>✅ Notion Connected Successfully!</h1>
+          <p>You can now use Notion in your workflows.</p>
+          <p>Close this window and return to the application.</p>
+          <script>
+            setTimeout(() => window.close(), 2000);
+          </script>
+        </body>
+      </html>
+    `);
+  } catch (error) {
+    console.error('Error handling Notion callback:', error);
+    res.status(500).send(`
+      <html>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1>❌ Connection Failed</h1>
+          <p>Error: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+        </body>
+      </html>
+    `);
   }
 });
 
 /**
  * GET /api/auth/notion/status
- * Check Notion connection status
+ * Check if Notion is connected
  */
-router.get('/notion/status', authenticateToken, (req: Request, res: Response) => {
-  const connected = !!process.env.NOTION_TOKEN;
-  res.json({ success: true, connected });
+router.get('/notion/status', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const status = await authService.getNotionStatus(userId);
+    res.json({ success: true, ...status });
+  } catch (error) {
+    console.error('Error checking Notion status:', error);
+    res.status(500).json({ success: false, error: 'Failed to check status' });
+  }
+});
+
+/**
+ * GET /api/auth/notion/databases
+ * List user's Notion databases
+ */
+router.get('/notion/databases', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const databases = await authService.getNotionDatabases(userId);
+    res.json({ success: true, databases });
+  } catch (error) {
+    console.error('Error listing Notion databases:', error);
+    const message = error instanceof Error ? error.message : 'Failed to list databases';
+    res.status(500).json({ success: false, error: message });
+  }
+});
+
+/**
+ * POST /api/auth/notion/disconnect
+ * Disconnect Notion
+ */
+router.post('/notion/disconnect', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    await authService.disconnectNotion(userId);
+    res.json({ success: true, message: 'Notion disconnected' });
+  } catch (error) {
+    console.error('Error disconnecting Notion:', error);
+    res.status(500).json({ success: false, error: 'Failed to disconnect Notion' });
+  }
 });
 
 // ============================================================
