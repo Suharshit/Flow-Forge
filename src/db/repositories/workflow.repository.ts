@@ -6,14 +6,15 @@ import {
 } from '../../types/workflow.types';
 
 export class WorkflowRepository {
-    async create(data: CreateWorkflowDTO): Promise<Workflow> {
+    async create(data: CreateWorkflowDTO & { user_id: string }): Promise<Workflow> {
         const query = `
-      INSERT INTO workflows (name, description, trigger_type, trigger_config, steps)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO workflows (user_id, name, description, trigger_type, trigger_config, steps)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
 
         const values = [
+            data.user_id,
             data.name,
             data.description || null,
             data.trigger_type,
@@ -36,12 +37,18 @@ export class WorkflowRepository {
         return this.mapRowToWorkflow(result.rows[0]);
     }
 
-    async findAll(filters?: { is_active?: boolean }): Promise<Workflow[]> {
-        let query = 'SELECT * FROM workflows';
+    async findAll(filters?: { user_id?: string; is_active?: boolean }): Promise<Workflow[]> {
+        let query = 'SELECT * FROM workflows WHERE 1=1';
         const values: any[] = [];
+        let paramCount = 1;
+
+        if (filters?.user_id) {
+            query += ` AND user_id = $${paramCount++}`;
+            values.push(filters.user_id);
+        }
 
         if (filters?.is_active !== undefined) {
-            query += ' WHERE is_active = $1';
+            query += ` AND is_active = $${paramCount++}`;
             values.push(filters.is_active);
         }
 
@@ -113,6 +120,7 @@ export class WorkflowRepository {
     private mapRowToWorkflow(row: any): Workflow {
         return {
             id: row.id,
+            user_id: row.user_id,
             name: row.name,
             description: row.description,
             trigger_type: row.trigger_type,

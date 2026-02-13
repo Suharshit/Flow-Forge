@@ -1,12 +1,17 @@
 import { Router, Request, Response } from 'express';
 import { WorkflowService } from '../../services/workflow.service';
 import { WorkflowExecutionService } from '../../services/workflow-execution.service';
+import { authenticateToken } from '../../middleware/auth.middleware';
 
 const router = Router();
 const workflowService = new WorkflowService();
+const executionService = new WorkflowExecutionService();
+
+// Apply auth middleware to all workflow routes
+router.use(authenticateToken);
 
 /**
- * GET /api/runs/:id
+ * GET /api/workflows/runs/:id
  * Get specific run details
  */
 router.get('/runs/:id', async (req: Request, res: Response) => {
@@ -24,10 +29,15 @@ router.get('/runs/:id', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * GET /api/workflows
+ * Get all workflows for the authenticated user
+ */
 router.get('/', async (req: Request, res: Response) => {
     try {
+        const userId = req.user!.userId;
         const activeOnly = req.query.active === 'true';
-        const workflows = await workflowService.getAllWorkflows(activeOnly);
+        const workflows = await workflowService.getAllWorkflows(userId, activeOnly);
         res.json({ success: true, data: workflows });
     } catch (error) {
         console.error('Error fetching workflows:', error);
@@ -36,7 +46,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/schedules
+ * GET /api/workflows/schedules
  * Get all scheduled jobs
  */
 router.get('/schedules', async (req: Request, res: Response) => {
@@ -49,6 +59,10 @@ router.get('/schedules', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * GET /api/workflows/:id
+ * Get a specific workflow
+ */
 router.get('/:id', async (req: Request, res: Response) => {
     try {
         const workflow = await workflowService.getWorkflow(req.params.id as string);
@@ -64,9 +78,14 @@ router.get('/:id', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * POST /api/workflows
+ * Create a new workflow for the authenticated user
+ */
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const workflow = await workflowService.createWorkflow(req.body);
+        const userId = req.user!.userId;
+        const workflow = await workflowService.createWorkflow(userId, req.body);
         res.status(201).json({ success: true, data: workflow });
     } catch (error) {
         console.error('Error creating workflow:', error);
@@ -75,6 +94,10 @@ router.post('/', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * PATCH /api/workflows/:id
+ * Update a workflow
+ */
 router.patch('/:id', async (req: Request, res: Response) => {
     try {
         const workflow = await workflowService.updateWorkflow(
@@ -93,6 +116,10 @@ router.patch('/:id', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * DELETE /api/workflows/:id
+ * Delete a workflow
+ */
 router.delete('/:id', async (req: Request, res: Response) => {
     try {
         const deleted = await workflowService.deleteWorkflow(req.params.id as string);
@@ -107,11 +134,6 @@ router.delete('/:id', async (req: Request, res: Response) => {
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 });
-
-// Add this after workflowService initialization
-const executionService = new WorkflowExecutionService();
-
-
 
 /**
  * POST /api/workflows/:id/execute

@@ -16,6 +16,7 @@ export interface TriggerConfig {
 
 export interface Workflow {
     id: string;
+    user_id?: string;
     name: string;
     description?: string;
     trigger_type: TriggerType;
