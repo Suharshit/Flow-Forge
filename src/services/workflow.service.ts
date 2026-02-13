@@ -15,8 +15,8 @@ export class WorkflowService {
         this.schedulerService = new SchedulerService();
     }
 
-    async createWorkflow(data: CreateWorkflowDTO): Promise<Workflow> {
-        const workflow = await this.workflowRepo.create(data);
+    async createWorkflow(userId: string, data: CreateWorkflowDTO): Promise<Workflow> {
+        const workflow = await this.workflowRepo.create({ ...data, user_id: userId });
 
         // If workflow is scheduled type and active, schedule it
         if (workflow.trigger_type === 'scheduled' && workflow.is_active) {
@@ -34,8 +34,11 @@ export class WorkflowService {
         return await this.workflowRepo.findById(id);
     }
 
-    async getAllWorkflows(activeOnly?: boolean): Promise<Workflow[]> {
-        const filters = activeOnly !== undefined ? { is_active: activeOnly } : undefined;
+    async getAllWorkflows(userId: string, activeOnly?: boolean): Promise<Workflow[]> {
+        const filters: { user_id: string; is_active?: boolean } = { user_id: userId };
+        if (activeOnly !== undefined) {
+            filters.is_active = activeOnly;
+        }
         return await this.workflowRepo.findAll(filters);
     }
 
