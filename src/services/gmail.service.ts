@@ -16,7 +16,7 @@ export class GmailService {
         this.credentialsRepo = new CredentialsRepository();
     }
 
-    getAuthUrl(): string {
+    getAuthUrl(userId: string): string {
         const scopes = [
             'https://www.googleapis.com/auth/gmail.readonly',
             'https://www.googleapis.com/auth/gmail.modify',
@@ -26,6 +26,7 @@ export class GmailService {
             access_type: 'offline',
             scope: scopes,
             prompt: 'consent',
+            state: userId,
         });
     }
 

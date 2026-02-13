@@ -16,7 +16,7 @@ export class GoogleCalendarService {
         this.credentialsRepo = new CredentialsRepository();
     }
 
-    getAuthUrl(): string {
+    getAuthUrl(userId: string): string {
         const scopes = [
             'https://www.googleapis.com/auth/calendar.events',
         ];
@@ -25,6 +25,7 @@ export class GoogleCalendarService {
             access_type: 'offline',
             scope: scopes,
             prompt: 'consent',
+            state: userId,
         });
     }
 

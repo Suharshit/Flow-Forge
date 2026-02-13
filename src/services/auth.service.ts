@@ -14,8 +14,8 @@ export class AuthService {
     }
 
     // Gmail methods
-    getGmailAuthUrl(): string {
-        return this.gmailService.getAuthUrl();
+    getGmailAuthUrl(userId: string): string {
+        return this.gmailService.getAuthUrl(userId);
     }
 
     async handleGmailCallback(code: string, userId: string): Promise<void> {
@@ -37,8 +37,8 @@ export class AuthService {
     }
 
     // Google Calendar methods
-    getGoogleCalendarAuthUrl(): string {
-        return this.calendarService.getAuthUrl();
+    getGoogleCalendarAuthUrl(userId: string): string {
+        return this.calendarService.getAuthUrl(userId);
     }
 
     async handleGoogleCalendarCallback(code: string, userId: string): Promise<void> {
