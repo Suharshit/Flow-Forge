@@ -19,6 +19,7 @@ export class GoogleCalendarService {
     getAuthUrl(userId: string): string {
         const scopes = [
             'https://www.googleapis.com/auth/calendar.events',
+            'https://www.googleapis.com/auth/calendar.readonly',
         ];
 
         return this.oauth2Client.generateAuthUrl({
