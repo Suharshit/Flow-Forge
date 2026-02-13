@@ -15,7 +15,8 @@ const authService = new AuthService();
  */
 router.get('/gmail/connect', authenticateToken, (req: Request, res: Response) => {
   try {
-    const authUrl = authService.getGmailAuthUrl();
+    const userId = req.user!.userId;
+    const authUrl = authService.getGmailAuthUrl(userId);
     res.json({ success: true, authUrl });
   } catch (error) {
     console.error('Error generating auth URL:', error);
@@ -35,10 +36,12 @@ router.get('/gmail/callback', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'Authorization code missing' });
     }
 
-    // For OAuth callbacks, we need the userId from state or session
-    // For now, we'll handle this by requiring the user to be authenticated
-    // The state parameter can carry the userId
-    const userId = typeof state === 'string' ? state : 'default-user';
+    // The state parameter contains the userId
+    const userId = typeof state === 'string' ? state : '';
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'Invalid state parameter' });
+    }
 
     await authService.handleGmailCallback(code, userId);
 
@@ -131,7 +134,8 @@ router.get('/notion/status', authenticateToken, (req: Request, res: Response) =>
  */
 router.get('/google-calendar/connect', authenticateToken, (req: Request, res: Response) => {
   try {
-    const authUrl = authService.getGoogleCalendarAuthUrl();
+    const userId = req.user!.userId;
+    const authUrl = authService.getGoogleCalendarAuthUrl(userId);
     res.json({ success: true, authUrl });
   } catch (error) {
     console.error('Error generating calendar auth URL:', error);
@@ -151,7 +155,11 @@ router.get('/google-calendar/callback', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'Authorization code missing' });
     }
 
-    const userId = typeof state === 'string' ? state : 'default-user';
+    const userId = typeof state === 'string' ? state : '';
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'Invalid state parameter' });
+    }
 
     await authService.handleGoogleCalendarCallback(code, userId);
 
