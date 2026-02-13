@@ -21,3 +21,13 @@ export interface NotionPageData {
     priority?: string;
     notes?: string;
 }
+
+export interface NotionTokenResponse {
+    access_token: string;
+    token_type: string;
+    bot_id: string;
+    workspace_name: string;
+    workspace_icon: string | null;
+    workspace_id: string;
+    owner: any;
+}

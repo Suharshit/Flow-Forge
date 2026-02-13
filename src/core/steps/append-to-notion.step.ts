@@ -38,6 +38,7 @@ export class AppendToNotionStep extends BaseStep {
                 if (config.checkDuplicates !== false && job.emailId) {
                     const emailLink = `https://mail.google.com/mail/u/0/#inbox/${job.emailId}`;
                     const existing = await this.notionService.queryDatabase(
+                        config.userId,
                         config.databaseId,
                         emailLink
                     );
@@ -64,7 +65,7 @@ export class AppendToNotionStep extends BaseStep {
                 };
 
                 // Create page in Notion
-                const pageId = await this.notionService.createPage(config.databaseId, pageData);
+                const pageId = await this.notionService.createPage(config.userId, config.databaseId, pageData);
                 created.push(pageId);
 
                 console.log(`Created Notion page: ${job.company} - ${job.position}`);
