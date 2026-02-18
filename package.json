@@ -5,14 +5,23 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/index.ts",
+    "worker": "nodemon --exec tsx src/worker.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:worker": "node dist/worker.js",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "test": "jest",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
     "migrate": "node-pg-migrate",
     "migrate:create": "node-pg-migrate create",
     "migrate:up": "node-pg-migrate up",
-    "migrate:down": "node-pg-migrate down"
+    "migrate:down": "node-pg-migrate down",
+    "docker:dev": "docker-compose -f docker-compose.yml up",
+    "docker:dev:build": "docker-compose -f docker-compose.yml up --build",
+    "docker:down": "docker-compose down"
   },
   "dependencies": {
     "@notionhq/client": "^5.9.0",

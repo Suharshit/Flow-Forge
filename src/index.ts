@@ -6,7 +6,11 @@ import authRoutes from './api/routes/auth.routes';
 import userAuthRoutes from './api/routes/user-auth.routes';
 
 import { closeRedis } from './config/redis';
-import './queue/workflow.worker'; // This starts the worker
+
+// Worker is now run separately via `npm run worker`
+
+
+import healthRoutes from './api/routes/health.routes';
 
 dotenv.config();
 
@@ -16,9 +20,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/health', (req: Request, res: Response) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+app.use('/health', healthRoutes);
 
 // User authentication routes (no auth middleware - public endpoints)
 app.use('/api/auth/user', userAuthRoutes);

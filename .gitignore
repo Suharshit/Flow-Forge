@@ -3,3 +3,17 @@ dist/
 .env
 *.log
 .DS_Store
+
+# Environment files
+.env.*
+!.env.example
+!.env.local.example
+
+# Docker persistent data
+postgres_data/
+redis_data/
+
+# Logs and coverage
+logs/
+coverage/
+Thumbs.db
